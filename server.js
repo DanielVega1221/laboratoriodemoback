@@ -23,11 +23,19 @@ app.use(express.json());
 app.use(morgan('dev'));
 
 // Database connection
-mongoose.connect(process.env.MONGO_URI)
+mongoose.connect(process.env.MONGO_URI, {
+  serverSelectionTimeoutMS: 5000,
+  socketTimeoutMS: 45000,
+})
   .then(() => console.log('✓ MongoDB conectado'))
   .catch(err => {
-    console.error('✗ Error conectando MongoDB:', err);
-    process.exit(1);
+    console.error('✗ Error conectando MongoDB:', err.message);
+    console.error('Verifica que la IP de Render esté en la whitelist de MongoDB Atlas');
+    // En producción, podrías querer mantener el servidor corriendo
+    // pero sin DB para health checks
+    if (process.env.NODE_ENV !== 'production') {
+      process.exit(1);
+    }
   });
 
 // Routes
