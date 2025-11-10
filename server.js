@@ -15,8 +15,8 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? 'https://tu-frontend.vercel.app'  // ← Tu URL de Vercel
+  origin: process.env.NODE_ENV === 'production'
+    ? process.env.FRONTEND_URL || 'https://tu-frontend.vercel.app' // usa FRONTEND_URL en producción si está definida
     : '*'
 }));
 app.use(express.json());
@@ -45,6 +45,16 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/protocols', protocolRoutes);
 app.use('/api/results', resultRoutes);
 app.use('/api/reports', reportRoutes);
+
+// Root route: evita 404 en GET / y ofrece un punto rápido de chequeo
+app.get('/', (req, res) => {
+  res.json({
+    status: 'ok',
+    service: 'laboratorio-backend',
+    env: process.env.NODE_ENV || 'development',
+    health: '/api/health'
+  });
+});
 
 // Health check
 app.get('/api/health', (req, res) => {
