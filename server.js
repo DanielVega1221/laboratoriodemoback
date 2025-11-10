@@ -14,11 +14,7 @@ const reportRoutes = require('./routes/reports');
 const app = express();
 
 // Middleware
-app.use(cors({
-  origin: process.env.NODE_ENV === 'production'
-    ? process.env.FRONTEND_URL || 'https://tu-frontend.vercel.app' // usa FRONTEND_URL en producción si está definida
-    : '*'
-}));
+app.use(cors({ origin: '*' })); // Permite todas las origins (necesario para Vercel)
 app.use(express.json());
 app.use(morgan('dev'));
 
